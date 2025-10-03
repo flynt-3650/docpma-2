@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'profile/profile_screen.dart';
+import 'profile/grades_screen.dart';
+import 'profile/schedule_screen.dart';
+import 'settings/settings_screen.dart';
+import 'auth/about_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,56 +15,93 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Студенческая информация',
+      title: 'Навигация',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Информация о студенте'),
+      home: const HomeShell(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class HomeShell extends StatefulWidget {
+  const HomeShell({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(title),
-      ),
-      body: const Center(child: MyInfoBlock()),
-    );
-  }
+  State<HomeShell> createState() => _HomeShellState();
 }
 
-class MyInfoBlock extends StatelessWidget {
-  const MyInfoBlock({super.key});
+class _HomeShellState extends State<HomeShell> {
+  int _currentIndex = 0;
+  String _userName = 'Иван Репилов';
+  int _step = 1;
+  int _counter = 0;
+  final List<String> _tasks = [];
+
+  void updateStep(int newStep) {
+    setState(() {
+      _step = newStep;
+    });
+  }
+
+  void incrementCounter() {
+    setState(() {
+      _counter += _step;
+    });
+  }
+
+  void addTask(String task) {
+    setState(() {
+      _tasks.add(task);
+    });
+  }
+
+  void removeTaskAt(int index) {
+    setState(() {
+      _tasks.removeAt(index);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        const Text(
-          'Иван Иванович Репилов',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 20),
-        const Text('Группа: ИКБО-11-22', style: TextStyle(fontSize: 18)),
-        const SizedBox(height: 10),
-        const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            'Студенческий билет: 22И400',
-            style: TextStyle(fontSize: 18),
+    final pages = [
+      ProfileScreen(userName: _userName, counter: _counter),
+      GradesScreen(
+        tasks: _tasks,
+        onAddTask: addTask,
+        onRemoveTask: removeTaskAt,
+      ),
+      ScheduleScreen(
+        counter: _counter,
+        step: _step,
+        onIncrement: incrementCounter,
+      ),
+      SettingsScreen(currentStep: _step, onStepChanged: updateStep),
+      const AboutScreen(),
+    ];
+
+    return Scaffold(
+      body: pages[_currentIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.person), label: 'Профиль'),
+          NavigationDestination(icon: Icon(Icons.task), label: 'Задачи'),
+          NavigationDestination(
+            icon: Icon(Icons.analytics),
+            label: 'Статистика',
           ),
-        ),
-      ],
+          NavigationDestination(icon: Icon(Icons.settings), label: 'Настройки'),
+          NavigationDestination(icon: Icon(Icons.help), label: 'Справка'),
+        ],
+      ),
     );
   }
 }
