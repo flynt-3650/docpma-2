@@ -21,87 +21,45 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text(title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Иван Иванович Репилов',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            const Text('Группа: ИКБО-11-22', style: TextStyle(fontSize: 18)),
-            const SizedBox(height: 10),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Студенческий билет: 22И400',
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-            const SizedBox(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Text('Счётчик нажатий:', style: TextStyle(fontSize: 18)),
-                const SizedBox(width: 10),
-                Text(
-                  '$_counter',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Container(
-              width: 200,
-              height: 100,
-              color: Colors.blueAccent,
-              alignment: Alignment.center,
-              child: const Text(
-                'Контейнер',
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: 150,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _incrementCounter,
-                child: const Text('Нажми меня'),
-              ),
-            ),
-          ],
+      body: const Center(child: MyInfoBlock()),
+    );
+  }
+}
+
+class MyInfoBlock extends StatelessWidget {
+  const MyInfoBlock({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        const Text(
+          'Иван Иванович Репилов',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-      ),
+        const SizedBox(height: 20),
+        const Text('Группа: ИКБО-11-22', style: TextStyle(fontSize: 18)),
+        const SizedBox(height: 10),
+        const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            'Студенческий билет: 22И400',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+      ],
     );
   }
 }
