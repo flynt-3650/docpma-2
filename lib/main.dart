@@ -11,10 +11,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = List.generate(10, (index) => 'Item ${index + 1}');
 
-    return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: items.map((item) => Text(item)).toList(),
+    return MaterialApp(
+      home: Scaffold(
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: items.map((item) => Text(item)).toList(),
+        ),
       ),
     );
   }
