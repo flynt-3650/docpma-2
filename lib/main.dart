@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'features/tasks/state/task_provider.dart';
+import 'features/tasks/screens/task_list_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,16 +12,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = List.generate(100, (index) => 'Item ${index + 1}');
-
-    return MaterialApp(
-      home: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: items.map((item) => Text(item)).toList(),
-          ),
+    return ChangeNotifierProvider(
+      create: (_) => TaskProvider(),
+      child: MaterialApp(
+        title: 'Управление задачами',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
         ),
+        home: const TaskListScreen(),
       ),
     );
   }
