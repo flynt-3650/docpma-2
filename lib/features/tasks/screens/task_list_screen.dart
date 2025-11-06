@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../state/task_provider.dart';
 import '../widgets/task_card.dart';
 import 'task_form_screen.dart';
+import 'task_details_screen.dart';
+import 'statistics_screen.dart';
 
 class TaskListScreen extends StatelessWidget {
   const TaskListScreen({super.key});
@@ -10,7 +12,22 @@ class TaskListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Задачи')),
+      appBar: AppBar(
+        title: const Text('Задачи'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const StatisticsScreen(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: Consumer<TaskProvider>(
         builder: (context, provider, child) {
           if (provider.tasks.isEmpty) {
@@ -27,7 +44,7 @@ class TaskListScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => TaskFormScreen(task: task),
+                      builder: (context) => TaskDetailsScreen(taskId: task.id),
                     ),
                   );
                 },
