@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../models/task.dart';
 import '../state/task_provider.dart';
 
@@ -50,7 +51,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         ),
       );
     }
-    Navigator.pop(context);
+    context.pop();
   }
 
   @override

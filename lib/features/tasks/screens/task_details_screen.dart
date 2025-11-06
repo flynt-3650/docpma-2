@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../models/task.dart';
 import '../state/task_provider.dart';
-import 'task_form_screen.dart';
 
 class TaskDetailsScreen extends StatelessWidget {
   final String taskId;
@@ -40,12 +40,7 @@ class TaskDetailsScreen extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TaskFormScreen(task: task),
-                  ),
-                );
+                context.replace('/task/${task.id}/edit', extra: task);
               },
               child: const Text('Редактировать задачу'),
             ),

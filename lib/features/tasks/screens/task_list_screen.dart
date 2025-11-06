@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../state/task_provider.dart';
 import '../widgets/task_card.dart';
-import 'task_form_screen.dart';
-import 'task_details_screen.dart';
-import 'statistics_screen.dart';
 
 class TaskListScreen extends StatelessWidget {
   const TaskListScreen({super.key});
@@ -18,12 +16,7 @@ class TaskListScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.bar_chart),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const StatisticsScreen(),
-                ),
-              );
+              context.push('/statistics');
             },
           ),
         ],
@@ -41,12 +34,7 @@ class TaskListScreen extends StatelessWidget {
               return TaskCard(
                 task: task,
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TaskDetailsScreen(taskId: task.id),
-                    ),
-                  );
+                  context.push('/task/${task.id}');
                 },
                 onDelete: () {
                   provider.deleteTask(task.id);
@@ -58,10 +46,7 @@ class TaskListScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const TaskFormScreen()),
-          );
+          context.push('/task/new');
         },
         child: const Icon(Icons.add),
       ),

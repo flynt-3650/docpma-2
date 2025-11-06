@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'task_list_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -17,13 +17,7 @@ class SettingsScreen extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const TaskListScreen(),
-                  ),
-                  (route) => false,
-                );
+                context.go('/');
               },
               child: const Text('Вернуться на главную'),
             ),
