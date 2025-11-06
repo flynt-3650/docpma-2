@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/task.dart';
 import '../state/task_provider.dart';
+import 'task_form_screen.dart';
 
 class TaskDetailsScreen extends StatelessWidget {
   final String taskId;
@@ -36,6 +37,18 @@ class TaskDetailsScreen extends StatelessWidget {
             Text('Приоритет: ${_getPriorityText(task.priority)}'),
             const SizedBox(height: 8),
             Text('Статус: ${_getStatusText(task.status)}'),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TaskFormScreen(task: task),
+                  ),
+                );
+              },
+              child: const Text('Редактировать задачу'),
+            ),
           ],
         ),
       ),
