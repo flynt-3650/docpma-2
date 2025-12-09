@@ -12,7 +12,6 @@ class SettingsScreen extends ConsumerWidget {
     final isDarkMode = ref.watch(isDarkModeProvider);
     final userName = ref.watch(userNameProvider);
     final appVersion = ref.watch(appVersionProvider);
-    final counter = ref.watch(counterProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -125,73 +124,6 @@ class SettingsScreen extends ConsumerWidget {
               onChanged: (value) {
                 ref.read(isDarkModeProvider.notifier).state = value;
               },
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Demo counter section
-          _buildSectionHeader(context, 'Демо: StateProvider'),
-          const SizedBox(height: 12),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  const Text(
-                    'Счётчик нажатий',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.primary.withOpacity(0.2),
-                          AppColors.accent.withOpacity(0.2),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      '$counter',
-                      style: const TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _CounterButton(
-                        icon: Icons.remove_rounded,
-                        onPressed: counter > 0
-                            ? () => ref.read(counterProvider.notifier).state--
-                            : null,
-                        color: AppColors.error,
-                      ),
-                      const SizedBox(width: 16),
-                      _CounterButton(
-                        icon: Icons.refresh_rounded,
-                        onPressed: () => ref.read(counterProvider.notifier).state = 0,
-                        color: AppColors.warning,
-                      ),
-                      const SizedBox(width: 16),
-                      _CounterButton(
-                        icon: Icons.add_rounded,
-                        onPressed: () => ref.read(counterProvider.notifier).state++,
-                        color: AppColors.success,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
             ),
           ),
 
@@ -316,38 +248,6 @@ class SettingsScreen extends ConsumerWidget {
             child: const Text('Сохранить'),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _CounterButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onPressed;
-  final Color color;
-
-  const _CounterButton({
-    required this.icon,
-    required this.onPressed,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: color.withOpacity(onPressed != null ? 0.1 : 0.05),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Icon(
-            icon,
-            color: onPressed != null ? color : color.withOpacity(0.3),
-            size: 28,
-          ),
-        ),
       ),
     );
   }

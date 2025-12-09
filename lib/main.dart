@@ -13,9 +13,7 @@ import 'features/tasks/screens/profile_screen.dart';
 import 'features/tasks/screens/calendar_screen.dart';
 
 void main() {
-  runApp(
-    const ProviderScope(child: TaskMasterApp()),
-  );
+  runApp(const ProviderScope(child: TaskMasterApp()));
 }
 
 class TaskMasterApp extends ConsumerWidget {
@@ -29,9 +27,12 @@ class TaskMasterApp extends ConsumerWidget {
       initialLocation: '/',
       routes: [
         // 1. Task List Screen (Home)
+        GoRoute(path: '/', builder: (context, state) => const TaskListScreen()),
+
+        // 3. Task Form Screen (Create) - ДОЛЖЕН быть выше!
         GoRoute(
-          path: '/',
-          builder: (context, state) => const TaskListScreen(),
+          path: '/task/new',
+          builder: (context, state) => const TaskFormScreen(),
         ),
 
         // 2. Task Details Screen
@@ -41,12 +42,6 @@ class TaskMasterApp extends ConsumerWidget {
             final id = state.pathParameters['id']!;
             return TaskDetailsScreen(taskId: id);
           },
-        ),
-
-        // 3. Task Form Screen (Create)
-        GoRoute(
-          path: '/task/new',
-          builder: (context, state) => const TaskFormScreen(),
         ),
 
         // 4. Task Form Screen (Edit)

@@ -68,6 +68,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             backgroundColor: AppColors.success,
           ),
         );
+        // Просто context.pop() БЕЗ перехода к деталям задачи!
+        context.pop();
+        return;
       } else {
         final task = ref.read(taskByIdProvider(widget.taskId!));
         if (task != null) {

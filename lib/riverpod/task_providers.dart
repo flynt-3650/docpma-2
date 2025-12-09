@@ -1,15 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/tasks/models/task.dart';
 
-// ==================== App State Providers ====================
-
 final counterProvider = StateProvider<int>((ref) => 0);
 final appVersionProvider = Provider<String>((ref) => '2.0.0');
 final isDarkModeProvider = StateProvider<bool>((ref) => true);
 final userNameProvider = StateProvider<String>((ref) => 'Гость');
 final userAvatarProvider = StateProvider<String?>((ref) => null);
-
-// ==================== Filter & Sort Providers ====================
 
 enum TaskSortBy { createdAt, dueDate, priority, title }
 
@@ -19,8 +15,6 @@ final taskSortByProvider = StateProvider<TaskSortBy>((ref) => TaskSortBy.created
 final taskFilterProvider = StateProvider<TaskFilter>((ref) => TaskFilter.all);
 final selectedCategoryProvider = StateProvider<TaskCategory?>((ref) => null);
 final searchQueryProvider = StateProvider<String>((ref) => '');
-
-// ==================== Tasks Notifier ====================
 
 class TasksNotifier extends StateNotifier<List<Task>> {
   TasksNotifier() : super(_initialTasks);
@@ -154,8 +148,6 @@ class TasksNotifier extends StateNotifier<List<Task>> {
 final tasksProvider = StateNotifierProvider<TasksNotifier, List<Task>>((ref) {
   return TasksNotifier();
 });
-
-// ==================== Filtered & Sorted Tasks ====================
 
 final filteredTasksProvider = Provider<List<Task>>((ref) {
   final tasks = ref.watch(tasksProvider);
@@ -325,7 +317,7 @@ final userStatsProvider = Provider<UserStats>((ref) {
   return UserStats(
     totalTasks: tasks.length,
     completedTasks: completed,
-    streak: 7, // Mock data
+    streak: 7,
     points: completed * 10,
   );
 });
