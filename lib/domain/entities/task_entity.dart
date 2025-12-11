@@ -12,7 +12,9 @@ enum TaskCategory {
   other,
 }
 
-class Task {
+typedef Task = TaskEntity;
+
+class TaskEntity {
   final String id;
   final String title;
   final String description;
@@ -22,9 +24,8 @@ class Task {
   final DateTime createdAt;
   final DateTime? dueDate;
   final DateTime? completedAt;
-  final List<String> tags;
 
-  Task({
+  TaskEntity({
     required this.id,
     required this.title,
     required this.description,
@@ -34,10 +35,9 @@ class Task {
     DateTime? createdAt,
     this.dueDate,
     this.completedAt,
-    this.tags = const [],
   }) : createdAt = createdAt ?? DateTime.now();
 
-  Task copyWith({
+  TaskEntity copyWith({
     String? title,
     String? description,
     TaskPriority? priority,
@@ -45,11 +45,10 @@ class Task {
     TaskCategory? category,
     DateTime? dueDate,
     DateTime? completedAt,
-    List<String>? tags,
     bool clearDueDate = false,
     bool clearCompletedAt = false,
   }) {
-    return Task(
+    return TaskEntity(
       id: id,
       title: title ?? this.title,
       description: description ?? this.description,
@@ -59,7 +58,6 @@ class Task {
       createdAt: createdAt,
       dueDate: clearDueDate ? null : (dueDate ?? this.dueDate),
       completedAt: clearCompletedAt ? null : (completedAt ?? this.completedAt),
-      tags: tags ?? this.tags,
     );
   }
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../riverpod/task_providers.dart';
+import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../models/task.dart';
+import '../../../domain/entities/task_entity.dart';
+
+typedef Task = TaskEntity;
 
 class TaskFormScreen extends ConsumerStatefulWidget {
   final String? taskId;
@@ -68,7 +70,6 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             backgroundColor: AppColors.success,
           ),
         );
-        // Просто context.pop() БЕЗ перехода к деталям задачи!
         context.pop();
         return;
       } else {
@@ -160,7 +161,6 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Title field
             TextFormField(
               controller: _titleController,
               decoration: InputDecoration(
@@ -189,7 +189,6 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
 
             const SizedBox(height: 20),
 
-            // Description field
             TextFormField(
               controller: _descriptionController,
               decoration: const InputDecoration(
@@ -204,7 +203,6 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
 
             const SizedBox(height: 24),
 
-            // Category selection
             Text(
               'Категория',
               style: TextStyle(
@@ -256,7 +254,6 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
 
             const SizedBox(height: 24),
 
-            // Priority selection
             Text(
               'Приоритет',
               style: TextStyle(
@@ -318,7 +315,6 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             if (isEditing) ...[
               const SizedBox(height: 24),
 
-              // Status selection (only for editing)
               Text(
                 'Статус',
                 style: TextStyle(
@@ -383,7 +379,6 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
 
             const SizedBox(height: 24),
 
-            // Due date selection
             Text(
               'Срок выполнения',
               style: TextStyle(
@@ -431,7 +426,6 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
               ),
             ),
 
-            // Quick date buttons
             const SizedBox(height: 12),
             Row(
               children: [
@@ -472,7 +466,6 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
 
             const SizedBox(height: 32),
 
-            // Save button
             ElevatedButton.icon(
               onPressed: _saveTask,
               icon: Icon(isEditing ? Icons.save_rounded : Icons.add_rounded),

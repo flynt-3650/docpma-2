@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../riverpod/task_providers.dart';
+import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../models/task.dart';
+import '../../../domain/entities/task_entity.dart';
+
+typedef Task = TaskEntity;
 
 class StatisticsScreen extends ConsumerWidget {
   const StatisticsScreen({super.key});
@@ -28,7 +30,6 @@ class StatisticsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Async loading indicator
           asyncCount.when(
             data: (count) => _buildAsyncCard(context, count),
             loading: () => _buildLoadingCard(context),
@@ -37,7 +38,6 @@ class StatisticsScreen extends ConsumerWidget {
 
           const SizedBox(height: 16),
 
-          // Main stats grid
           Row(
             children: [
               Expanded(
@@ -110,7 +110,6 @@ class StatisticsScreen extends ConsumerWidget {
 
           const SizedBox(height: 24),
 
-          // Progress bar
           if (total > 0) ...[
             Card(
               child: Padding(
@@ -172,7 +171,6 @@ class StatisticsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
           ],
 
-          // Categories breakdown
           Text(
             'По категориям',
             style: TextStyle(
@@ -200,7 +198,6 @@ class StatisticsScreen extends ConsumerWidget {
 
           const SizedBox(height: 24),
 
-          // Priority breakdown
           Text(
             'По приоритету',
             style: TextStyle(

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../riverpod/task_providers.dart';
+import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../models/task.dart';
+import '../../../domain/entities/task_entity.dart';
+
+typedef Task = TaskEntity;
 
 class TaskListScreen extends ConsumerWidget {
   const TaskListScreen({super.key});
@@ -18,36 +20,25 @@ class TaskListScreen extends ConsumerWidget {
       body: CustomScrollView(
         slivers: [
           _buildAppBar(context, ref),
-          SliverToBoxAdapter(
-            child: _buildFilterChips(context, ref, filter),
-          ),
+          SliverToBoxAdapter(child: _buildFilterChips(context, ref, filter)),
           if (selectedCategory != null)
             SliverToBoxAdapter(
               child: _buildCategoryBanner(context, ref, selectedCategory),
             ),
-          SliverToBoxAdapter(
-            child: _buildSearchBar(context, ref),
-          ),
+          SliverToBoxAdapter(child: _buildSearchBar(context, ref)),
           if (tasks.isEmpty)
-            SliverFillRemaining(
-              child: _buildEmptyState(context, filter),
-            )
+            SliverFillRemaining(child: _buildEmptyState(context, filter))
           else
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final task = tasks[index];
-                    return _TaskCard(task: task);
-                  },
-                  childCount: tasks.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final task = tasks[index];
+                  return _TaskCard(task: task);
+                }, childCount: tasks.length),
               ),
             ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 100),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -83,10 +74,7 @@ class TaskListScreen extends ConsumerWidget {
                 ),
                 child: Text(
                   '$overdueCount',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
               ),
             ],
@@ -125,7 +113,11 @@ class TaskListScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFilterChips(BuildContext context, WidgetRef ref, TaskFilter filter) {
+  Widget _buildFilterChips(
+    BuildContext context,
+    WidgetRef ref,
+    TaskFilter filter,
+  ) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -135,21 +127,24 @@ class TaskListScreen extends ConsumerWidget {
             label: 'Все',
             icon: Icons.list_rounded,
             isSelected: filter == TaskFilter.all,
-            onTap: () => ref.read(taskFilterProvider.notifier).state = TaskFilter.all,
+            onTap: () =>
+                ref.read(taskFilterProvider.notifier).state = TaskFilter.all,
           ),
           const SizedBox(width: 8),
           _FilterChip(
             label: 'Сегодня',
             icon: Icons.today_rounded,
             isSelected: filter == TaskFilter.today,
-            onTap: () => ref.read(taskFilterProvider.notifier).state = TaskFilter.today,
+            onTap: () =>
+                ref.read(taskFilterProvider.notifier).state = TaskFilter.today,
           ),
           const SizedBox(width: 8),
           _FilterChip(
             label: 'Просрочено',
             icon: Icons.warning_rounded,
             isSelected: filter == TaskFilter.overdue,
-            onTap: () => ref.read(taskFilterProvider.notifier).state = TaskFilter.overdue,
+            onTap: () => ref.read(taskFilterProvider.notifier).state =
+                TaskFilter.overdue,
             color: AppColors.error,
           ),
           const SizedBox(width: 8),
@@ -157,7 +152,8 @@ class TaskListScreen extends ConsumerWidget {
             label: 'Выполнено',
             icon: Icons.check_circle_rounded,
             isSelected: filter == TaskFilter.completed,
-            onTap: () => ref.read(taskFilterProvider.notifier).state = TaskFilter.completed,
+            onTap: () => ref.read(taskFilterProvider.notifier).state =
+                TaskFilter.completed,
             color: AppColors.success,
           ),
         ],
@@ -165,7 +161,11 @@ class TaskListScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCategoryBanner(BuildContext context, WidgetRef ref, TaskCategory category) {
+  Widget _buildCategoryBanner(
+    BuildContext context,
+    WidgetRef ref,
+    TaskCategory category,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -185,7 +185,8 @@ class TaskListScreen extends ConsumerWidget {
           ),
           const Spacer(),
           GestureDetector(
-            onTap: () => ref.read(selectedCategoryProvider.notifier).state = null,
+            onTap: () =>
+                ref.read(selectedCategoryProvider.notifier).state = null,
             child: Icon(
               Icons.close_rounded,
               size: 20,
@@ -243,11 +244,7 @@ class TaskListScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 80,
-            color: AppColors.primary.withOpacity(0.5),
-          ),
+          Icon(icon, size: 80, color: AppColors.primary.withOpacity(0.5)),
           const SizedBox(height: 16),
           Text(
             message,
@@ -279,10 +276,7 @@ class TaskListScreen extends ConsumerWidget {
           children: [
             const Text(
               'Сортировка',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             _SortOption(
@@ -290,7 +284,8 @@ class TaskListScreen extends ConsumerWidget {
               label: 'По дате создания',
               isSelected: currentSort == TaskSortBy.createdAt,
               onTap: () {
-                ref.read(taskSortByProvider.notifier).state = TaskSortBy.createdAt;
+                ref.read(taskSortByProvider.notifier).state =
+                    TaskSortBy.createdAt;
                 Navigator.pop(context);
               },
             ),
@@ -299,7 +294,8 @@ class TaskListScreen extends ConsumerWidget {
               label: 'По сроку выполнения',
               isSelected: currentSort == TaskSortBy.dueDate,
               onTap: () {
-                ref.read(taskSortByProvider.notifier).state = TaskSortBy.dueDate;
+                ref.read(taskSortByProvider.notifier).state =
+                    TaskSortBy.dueDate;
                 Navigator.pop(context);
               },
             ),
@@ -308,7 +304,8 @@ class TaskListScreen extends ConsumerWidget {
               label: 'По приоритету',
               isSelected: currentSort == TaskSortBy.priority,
               onTap: () {
-                ref.read(taskSortByProvider.notifier).state = TaskSortBy.priority;
+                ref.read(taskSortByProvider.notifier).state =
+                    TaskSortBy.priority;
                 Navigator.pop(context);
               },
             ),
@@ -379,11 +376,7 @@ class _FilterChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isSelected ? Colors.white : chipColor,
-            ),
+            Icon(icon, size: 18, color: isSelected ? Colors.white : chipColor),
             const SizedBox(width: 6),
             Text(
               label,
@@ -415,10 +408,7 @@ class _SortOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(
-        icon,
-        color: isSelected ? AppColors.primary : null,
-      ),
+      leading: Icon(icon, color: isSelected ? AppColors.primary : null),
       title: Text(
         label,
         style: TextStyle(
@@ -430,9 +420,7 @@ class _SortOption extends StatelessWidget {
           ? const Icon(Icons.check_rounded, color: AppColors.primary)
           : null,
       onTap: onTap,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );
   }
 }
@@ -464,9 +452,7 @@ class _TaskCard extends ConsumerWidget {
             content: Text('Задача "${task.title}" удалена'),
             action: SnackBarAction(
               label: 'Отменить',
-              onPressed: () {
-                // TODO: Implement undo
-              },
+              onPressed: () {},
             ),
           ),
         );
@@ -506,7 +492,11 @@ class _TaskCard extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: task.status == TaskStatus.completed
-                      ? const Icon(Icons.check_rounded, size: 18, color: Colors.white)
+                      ? const Icon(
+                          Icons.check_rounded,
+                          size: 18,
+                          color: Colors.white,
+                        )
                       : null,
                 ),
               ),
@@ -532,7 +522,9 @@ class _TaskCard extends ConsumerWidget {
                                   ? TextDecoration.lineThrough
                                   : null,
                               color: task.status == TaskStatus.completed
-                                  ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
+                                  ? Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withOpacity(0.5)
                                   : null,
                             ),
                           ),
@@ -547,7 +539,9 @@ class _TaskCard extends ConsumerWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                     ],
@@ -562,7 +556,10 @@ class _TaskCard extends ConsumerWidget {
                         if (task.status == TaskStatus.inProgress) ...[
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.info.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
@@ -570,7 +567,11 @@ class _TaskCard extends ConsumerWidget {
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.play_arrow_rounded, size: 14, color: AppColors.info),
+                                Icon(
+                                  Icons.play_arrow_rounded,
+                                  size: 14,
+                                  color: AppColors.info,
+                                ),
                                 SizedBox(width: 4),
                                 Text(
                                   'В работе',
