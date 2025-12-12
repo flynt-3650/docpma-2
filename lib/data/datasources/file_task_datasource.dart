@@ -1,27 +1,21 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/entities/task_entity.dart';
 
 class FileTaskDataSource {
-  static const String _fileName = 'tasks.json';
+  static const String _storageKey = 'tasks_data';
 
   List<TaskEntity> _tasks = [];
   bool _isInitialized = false;
   int _idCounter = 0;
 
-  Future<File> _getLocalFile() async {
-    final directory = await getApplicationDocumentsDirectory();
-    return File('${directory.path}/$_fileName');
-  }
-
   Future<void> init() async {
     if (_isInitialized) return;
 
     try {
-      final file = await _getLocalFile();
-      if (await file.exists()) {
-        final contents = await file.readAsString();
+      final prefs = await SharedPreferences.getInstance();
+      final contents = prefs.getString(_storageKey);
+      if (contents != null && contents.isNotEmpty) {
         final List<dynamic> jsonList = json.decode(contents);
         _tasks = jsonList.map((json) => _taskFromJson(json)).toList();
 
@@ -107,9 +101,9 @@ class FileTaskDataSource {
   }
 
   Future<void> _saveToFile() async {
-    final file = await _getLocalFile();
+    final prefs = await SharedPreferences.getInstance();
     final jsonList = _tasks.map((task) => _taskToJson(task)).toList();
-    await file.writeAsString(json.encode(jsonList));
+    await prefs.setString(_storageKey, json.encode(jsonList));
   }
 
   Map<String, dynamic> _taskToJson(TaskEntity task) {

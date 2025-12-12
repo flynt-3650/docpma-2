@@ -13,6 +13,7 @@ import 'features/tasks/screens/profile_screen.dart';
 import 'features/tasks/screens/calendar_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: TaskMasterApp()));
 }
 

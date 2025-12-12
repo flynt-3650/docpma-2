@@ -55,7 +55,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               color: Theme.of(context).cardTheme.color,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -101,21 +101,22 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
                 Row(
                   children: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
-                      .map((day) => Expanded(
-                            child: Center(
-                              child: Text(
-                                day,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.5),
-                                ),
+                      .map(
+                        (day) => Expanded(
+                          child: Center(
+                            child: Text(
+                              day,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.5),
                               ),
                             ),
-                          ))
+                          ),
+                        ),
+                      )
                       .toList(),
                 ),
                 const SizedBox(height: 8),
@@ -132,7 +133,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -155,10 +156,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       Text(
                         '${selectedDateTasks.length} задач',
                         style: TextStyle(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -197,8 +197,16 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   }
 
   Widget _buildCalendarGrid(Map<DateTime, List<Task>> tasksWithDates) {
-    final firstDayOfMonth = DateTime(_focusedMonth.year, _focusedMonth.month, 1);
-    final lastDayOfMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0);
+    final firstDayOfMonth = DateTime(
+      _focusedMonth.year,
+      _focusedMonth.month,
+      1,
+    );
+    final lastDayOfMonth = DateTime(
+      _focusedMonth.year,
+      _focusedMonth.month + 1,
+      0,
+    );
 
     int startWeekday = firstDayOfMonth.weekday;
 
@@ -206,7 +214,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
     final totalDays = daysFromPrevMonth + lastDayOfMonth.day;
     final totalRows = (totalDays / 7).ceil();
-    final totalCells = totalRows * 7;
 
     final today = DateTime.now();
 
@@ -216,13 +223,19 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           children: List.generate(7, (col) {
             final cellIndex = row * 7 + col;
             final dayOffset = cellIndex - daysFromPrevMonth + 1;
-            final date = DateTime(_focusedMonth.year, _focusedMonth.month, dayOffset);
+            final date = DateTime(
+              _focusedMonth.year,
+              _focusedMonth.month,
+              dayOffset,
+            );
 
             final isCurrentMonth = date.month == _focusedMonth.month;
-            final isToday = date.year == today.year &&
+            final isToday =
+                date.year == today.year &&
                 date.month == today.month &&
                 date.day == today.day;
-            final isSelected = date.year == _selectedDate.year &&
+            final isSelected =
+                date.year == _selectedDate.year &&
                 date.month == _selectedDate.month &&
                 date.day == _selectedDate.day;
 
@@ -245,8 +258,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     color: isSelected
                         ? AppColors.primary
                         : isToday
-                            ? AppColors.primary.withOpacity(0.1)
-                            : null,
+                        ? AppColors.primary.withValues(alpha: 0.1)
+                        : null,
                     borderRadius: BorderRadius.circular(10),
                     border: isToday && !isSelected
                         ? Border.all(color: AppColors.primary, width: 2)
@@ -264,11 +277,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                           color: isSelected
                               ? Colors.white
                               : isCurrentMonth
-                                  ? null
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.3),
+                              ? null
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.3),
                         ),
                       ),
                       if (hasTask && isCurrentMonth)
@@ -281,7 +293,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                               (i) => Container(
                                 width: 5,
                                 height: 5,
-                                margin: const EdgeInsets.symmetric(horizontal: 1),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 1,
+                                ),
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? Colors.white
@@ -311,14 +325,18 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           Icon(
             Icons.event_available_rounded,
             size: 64,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.2),
           ),
           const SizedBox(height: 16),
           Text(
             'На этот день задач нет',
             style: TextStyle(
               fontSize: 16,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
           ),
           const SizedBox(height: 8),
@@ -345,7 +363,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       'Сентябрь',
       'Октябрь',
       'Ноябрь',
-      'Декабрь'
+      'Декабрь',
     ];
     return '${months[date.month - 1]} ${date.year}';
   }
@@ -358,7 +376,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       'Четверг',
       'Пятница',
       'Суббота',
-      'Воскресенье'
+      'Воскресенье',
     ];
     const months = [
       'января',
@@ -372,7 +390,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       'сентября',
       'октября',
       'ноября',
-      'декабря'
+      'декабря',
     ];
     return '${weekdays[date.weekday - 1]}, ${date.day} ${months[date.month - 1]}';
   }
@@ -429,7 +447,9 @@ class _TaskTile extends ConsumerWidget {
               task.category.displayName,
               style: TextStyle(
                 fontSize: 13,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -437,7 +457,7 @@ class _TaskTile extends ConsumerWidget {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: _getPriorityColor(task.priority).withOpacity(0.1),
+            color: _getPriorityColor(task.priority).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
@@ -465,4 +485,3 @@ class _TaskTile extends ConsumerWidget {
     }
   }
 }
-
