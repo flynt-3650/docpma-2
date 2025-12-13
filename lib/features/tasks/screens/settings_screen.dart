@@ -154,6 +154,13 @@ class SettingsScreen extends ConsumerWidget {
                   subtitle: 'Планирование по дням',
                   onTap: () => context.push('/calendar'),
                 ),
+                const Divider(height: 1),
+                _NavigationTile(
+                  icon: Icons.public_rounded,
+                  title: 'Сетевой слой (ПР13)',
+                  subtitle: 'Dio + Retrofit: 2 API, 5 запросов',
+                  onTap: () => context.push('/network'),
+                ),
               ],
             ),
           ),

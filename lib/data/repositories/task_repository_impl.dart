@@ -1,11 +1,11 @@
-import '../../core/models/task.dart';
+import '../../domain/entities/task_entity.dart';
 import '../../domain/repositories/task_repository.dart';
-import '../datasources/local/local_task_datasource.dart';
+import '../datasources/file_task_datasource.dart';
 
 class TaskRepositoryImpl implements TaskRepository {
-  final LocalTaskDataSource _localDataSource;
+  final FileTaskDataSource _localDataSource;
 
-  TaskRepositoryImpl({required LocalTaskDataSource localDataSource})
+  TaskRepositoryImpl({required FileTaskDataSource localDataSource})
     : _localDataSource = localDataSource;
 
   @override

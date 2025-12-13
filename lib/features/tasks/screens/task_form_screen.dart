@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/models/task.dart';
+import '../../../domain/entities/task_entity.dart';
 
 typedef Task = TaskEntity;
 
@@ -52,49 +52,66 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     }
   }
 
-  void _saveTask() {
+  Future<void> _saveTask() async {
     if (_formKey.currentState!.validate()) {
       final tasksNotifier = ref.read(tasksProvider.notifier);
 
-      if (widget.taskId == null) {
-        tasksNotifier.addTask(
-          title: _titleController.text,
-          description: _descriptionController.text,
-          priority: _priority,
-          category: _category,
-          dueDate: _dueDate,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Задача создана'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-        context.pop();
-        return;
-      } else {
-        final task = ref.read(taskByIdProvider(widget.taskId!));
-        if (task != null) {
-          final updatedTask = task.copyWith(
+      try {
+        if (widget.taskId == null) {
+          await tasksNotifier.addTask(
             title: _titleController.text,
             description: _descriptionController.text,
             priority: _priority,
-            status: _status,
             category: _category,
             dueDate: _dueDate,
-            clearDueDate: _dueDate == null && task.dueDate != null,
           );
-          tasksNotifier.updateTask(updatedTask);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Задача создана'),
+                backgroundColor: AppColors.success,
+              ),
+            );
+            context.pop();
+          }
+          return;
+        } else {
+          final task = ref.read(taskByIdProvider(widget.taskId!));
+          if (task != null) {
+            final updatedTask = task.copyWith(
+              title: _titleController.text,
+              description: _descriptionController.text,
+              priority: _priority,
+              status: _status,
+              category: _category,
+              dueDate: _dueDate,
+              clearDueDate: _dueDate == null && task.dueDate != null,
+            );
+            await tasksNotifier.updateTask(updatedTask);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Задача обновлена'),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+            }
+          }
+        }
+
+        if (mounted) {
+          context.pop();
+        }
+      } catch (e) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Задача обновлена'),
-              backgroundColor: AppColors.success,
+            SnackBar(
+              content: Text('Ошибка: $e'),
+              backgroundColor: AppColors.error,
             ),
           );
         }
       }
-
-      context.pop();
     }
   }
 
@@ -221,7 +238,10 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                   onTap: () => setState(() => _category = category),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? _getCategoryColor(category)
@@ -230,7 +250,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                       border: isSelected
                           ? null
                           : Border.all(
-                              color: _getCategoryColor(category).withOpacity(0.3),
+                              color: _getCategoryColor(
+                                category,
+                              ).withOpacity(0.3),
                             ),
                     ),
                     child: Row(
@@ -242,7 +264,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                           category.displayName,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: isSelected ? Colors.white : _getCategoryColor(category),
+                            color: isSelected
+                                ? Colors.white
+                                : _getCategoryColor(category),
                           ),
                         ),
                       ],
@@ -283,7 +307,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                         border: isSelected
                             ? null
                             : Border.all(
-                                color: _getPriorityColor(priority).withOpacity(0.3),
+                                color: _getPriorityColor(
+                                  priority,
+                                ).withOpacity(0.3),
                               ),
                       ),
                       child: Column(
@@ -320,7 +346,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
               const SizedBox(height: 12),
@@ -344,7 +372,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                           border: isSelected
                               ? null
                               : Border.all(
-                                  color: _getStatusColor(status).withOpacity(0.3),
+                                  color: _getStatusColor(
+                                    status,
+                                  ).withOpacity(0.3),
                                 ),
                         ),
                         child: Column(
@@ -412,7 +442,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                           fontSize: 16,
                           color: _dueDate != null
                               ? null
-                              : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.5),
                         ),
                       ),
                     ),
@@ -444,9 +476,17 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                   label: 'Завтра',
                   icon: Icons.event_rounded,
                   onTap: () {
-                    final tomorrow = DateTime.now().add(const Duration(days: 1));
+                    final tomorrow = DateTime.now().add(
+                      const Duration(days: 1),
+                    );
                     setState(() {
-                      _dueDate = DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 23, 59);
+                      _dueDate = DateTime(
+                        tomorrow.year,
+                        tomorrow.month,
+                        tomorrow.day,
+                        23,
+                        59,
+                      );
                     });
                   },
                 ),
@@ -455,9 +495,17 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                   label: 'Неделя',
                   icon: Icons.date_range_rounded,
                   onTap: () {
-                    final nextWeek = DateTime.now().add(const Duration(days: 7));
+                    final nextWeek = DateTime.now().add(
+                      const Duration(days: 7),
+                    );
                     setState(() {
-                      _dueDate = DateTime(nextWeek.year, nextWeek.month, nextWeek.day, 23, 59);
+                      _dueDate = DateTime(
+                        nextWeek.year,
+                        nextWeek.month,
+                        nextWeek.day,
+                        23,
+                        59,
+                      );
                     });
                   },
                 ),

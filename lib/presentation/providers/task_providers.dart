@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/models/task.dart';
+import '../../domain/entities/task_entity.dart';
 import '../../domain/repositories/task_repository.dart';
 import '../../domain/usecases/task_usecases.dart';
 import '../../data/repositories/task_repository_impl.dart';
-import '../../data/datasources/local/local_task_datasource.dart';
+import '../../data/datasources/file_task_datasource.dart';
 import '../../data/datasources/settings_local_datasource.dart';
 
-final localTaskDataSourceProvider = Provider<LocalTaskDataSource>((ref) {
-  return LocalTaskDataSource();
+final fileTaskDataSourceProvider = Provider<FileTaskDataSource>((ref) {
+  return FileTaskDataSource();
 });
 
 final settingsDataSourceProvider = Provider<SettingsLocalDataSource>((ref) {
@@ -15,8 +15,8 @@ final settingsDataSourceProvider = Provider<SettingsLocalDataSource>((ref) {
 });
 
 final taskRepositoryProvider = Provider<TaskRepository>((ref) {
-  final localDataSource = ref.watch(localTaskDataSourceProvider);
-  return TaskRepositoryImpl(localDataSource: localDataSource);
+  final fileDataSource = ref.watch(fileTaskDataSourceProvider);
+  return TaskRepositoryImpl(localDataSource: fileDataSource);
 });
 
 final getAllTasksUseCaseProvider = Provider<GetAllTasksUseCase>((ref) {
