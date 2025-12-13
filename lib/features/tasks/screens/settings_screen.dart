@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../riverpod/task_providers.dart';
+import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -14,13 +14,10 @@ class SettingsScreen extends ConsumerWidget {
     final appVersion = ref.watch(appVersionProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Настройки'),
-      ),
+      appBar: AppBar(title: const Text('Настройки')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // App info card
           Card(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -56,7 +53,9 @@ class SettingsScreen extends ConsumerWidget {
                         Text(
                           'Версия $appVersion',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.6),
                           ),
                         ),
                       ],
@@ -69,7 +68,6 @@ class SettingsScreen extends ConsumerWidget {
 
           const SizedBox(height: 24),
 
-          // Profile section
           _buildSectionHeader(context, 'Профиль'),
           const SizedBox(height: 12),
           Card(
@@ -98,7 +96,6 @@ class SettingsScreen extends ConsumerWidget {
 
           const SizedBox(height: 24),
 
-          // Appearance section
           _buildSectionHeader(context, 'Внешний вид'),
           const SizedBox(height: 12),
           Card(
@@ -111,7 +108,9 @@ class SettingsScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
-                  isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                  isDarkMode
+                      ? Icons.dark_mode_rounded
+                      : Icons.light_mode_rounded,
                   color: isDarkMode ? AppColors.primaryDark : AppColors.accent,
                 ),
               ),
@@ -122,14 +121,13 @@ class SettingsScreen extends ConsumerWidget {
               subtitle: Text(isDarkMode ? 'Включена' : 'Выключена'),
               value: isDarkMode,
               onChanged: (value) {
-                ref.read(isDarkModeProvider.notifier).state = value;
+                ref.read(isDarkModeProvider.notifier).setValue(value);
               },
             ),
           ),
 
           const SizedBox(height: 24),
 
-          // Navigation section
           _buildSectionHeader(context, 'Навигация'),
           const SizedBox(height: 12),
 
@@ -162,7 +160,6 @@ class SettingsScreen extends ConsumerWidget {
 
           const SizedBox(height: 24),
 
-          // About section
           _buildSectionHeader(context, 'О приложении'),
           const SizedBox(height: 12),
           Card(
@@ -175,7 +172,10 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.favorite_rounded, color: AppColors.error),
+                  leading: const Icon(
+                    Icons.favorite_rounded,
+                    color: AppColors.error,
+                  ),
                   title: const Text('Сделано с любовью'),
                   subtitle: const Text('Для демонстрации DI паттернов'),
                 ),
@@ -185,7 +185,6 @@ class SettingsScreen extends ConsumerWidget {
 
           const SizedBox(height: 32),
 
-          // Back to home button
           ElevatedButton.icon(
             onPressed: () => context.go('/'),
             icon: const Icon(Icons.home_rounded),
@@ -217,7 +216,8 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   void _showEditNameDialog(BuildContext context, WidgetRef ref) {
-    final controller = TextEditingController(text: ref.read(userNameProvider));
+    final currentName = ref.read(userNameProvider);
+    final controller = TextEditingController(text: currentName);
 
     showDialog(
       context: context,
@@ -241,7 +241,7 @@ class SettingsScreen extends ConsumerWidget {
           ElevatedButton(
             onPressed: () {
               if (controller.text.isNotEmpty) {
-                ref.read(userNameProvider.notifier).state = controller.text;
+                ref.read(userNameProvider.notifier).setName(controller.text);
               }
               Navigator.pop(context);
             },
@@ -277,10 +277,7 @@ class _NavigationTile extends StatelessWidget {
         ),
         child: Icon(icon, color: AppColors.primary),
       ),
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.w600),
-      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.chevron_right_rounded),
       onTap: onTap,

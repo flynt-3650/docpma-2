@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../riverpod/task_providers.dart';
+import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../models/task.dart';
+import '../../../core/models/task.dart';
+
+typedef Task = TaskEntity;
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
@@ -47,7 +49,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       ),
       body: Column(
         children: [
-          // Calendar header
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -62,7 +63,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             ),
             child: Column(
               children: [
-                // Month navigation
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -99,7 +99,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Weekday headers
                 Row(
                   children: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
                       .map((day) => Expanded(
@@ -121,13 +120,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // Calendar grid
                 _buildCalendarGrid(tasksWithDates),
               ],
             ),
           ),
 
-          // Selected date info
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -182,7 +179,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             ),
           ),
 
-          // Tasks for selected date
           Expanded(
             child: selectedDateTasks.isEmpty
                 ? _buildEmptyState()
@@ -204,16 +200,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     final firstDayOfMonth = DateTime(_focusedMonth.year, _focusedMonth.month, 1);
     final lastDayOfMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0);
 
-    // Get the weekday of the first day (1 = Monday, 7 = Sunday)
     int startWeekday = firstDayOfMonth.weekday;
 
-    // Calculate the number of days to show from the previous month
     final daysFromPrevMonth = startWeekday - 1;
 
-    // Calculate total cells needed (complete weeks)
     final totalDays = daysFromPrevMonth + lastDayOfMonth.day;
     final totalRows = (totalDays / 7).ceil();
-    final totalCells = totalRows * 7;
 
     final today = DateTime.now();
 

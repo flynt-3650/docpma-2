@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../riverpod/task_providers.dart';
+import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../models/task.dart';
+import '../../../core/models/task.dart';
+
+typedef Task = TaskEntity;
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -37,7 +39,6 @@ class ProfileScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 20),
-                      // Avatar
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
@@ -112,7 +113,6 @@ class ProfileScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                // Stats row
                 Row(
                   children: [
                     Expanded(
@@ -146,7 +146,6 @@ class ProfileScreen extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
-                // Achievements section
                 Row(
                   children: [
                     const Icon(Icons.emoji_events_rounded, color: AppColors.accent),
@@ -205,7 +204,6 @@ class ProfileScreen extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
-                // Activity by category
                 const Row(
                   children: [
                     Icon(Icons.donut_large_rounded, color: AppColors.primary),
@@ -238,7 +236,6 @@ class ProfileScreen extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
-                // Recent activity
                 const Row(
                   children: [
                     Icon(Icons.history_rounded, color: AppColors.primary),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../riverpod/task_providers.dart';
+import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../models/task.dart';
+import '../../../core/models/task.dart';
+
+typedef Task = TaskEntity;
 
 class TaskDetailsScreen extends ConsumerWidget {
   final String taskId;
@@ -125,7 +127,6 @@ class TaskDetailsScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                // Live clock card
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -185,7 +186,6 @@ class TaskDetailsScreen extends ConsumerWidget {
 
                 const SizedBox(height: 16),
 
-                // Description card
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -229,7 +229,6 @@ class TaskDetailsScreen extends ConsumerWidget {
 
                 const SizedBox(height: 16),
 
-                // Details card
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -304,7 +303,6 @@ class TaskDetailsScreen extends ConsumerWidget {
 
                 const SizedBox(height: 24),
 
-                // Action buttons
                 Row(
                   children: [
                     Expanded(
