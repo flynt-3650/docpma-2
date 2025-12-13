@@ -1,30 +1,15 @@
-/// DTO for local storage representation of a task.
-///
-/// Stored as JSON in a file.
-class LocalTaskDTO {
+class TaskDTO {
   final String id;
   final String title;
   final String description;
-
-  /// Enum index: TaskPriority.index
   final int priority;
-
-  /// Enum index: TaskStatus.index
   final int status;
-
-  /// Enum index: TaskCategory.index
   final int category;
-
-  /// ISO string
   final String createdAt;
-
-  /// ISO string
   final String? dueDate;
-
-  /// ISO string
   final String? completedAt;
 
-  const LocalTaskDTO({
+  const TaskDTO({
     required this.id,
     required this.title,
     required this.description,
@@ -36,8 +21,8 @@ class LocalTaskDTO {
     this.completedAt,
   });
 
-  factory LocalTaskDTO.fromJson(Map<String, dynamic> json) {
-    return LocalTaskDTO(
+  factory TaskDTO.fromJson(Map<String, dynamic> json) {
+    return TaskDTO(
       id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String,

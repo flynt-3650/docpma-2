@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import '../../../core/models/task.dart';
-import 'dto/local_task_dto.dart';
-import 'dto/mappers/local_task_mapper.dart';
+import 'dto/task_dto.dart';
+import 'mappers/task_mapper.dart';
 
 class LocalTaskDataSource {
   static const String _fileName = 'tasks.json';
@@ -26,7 +26,7 @@ class LocalTaskDataSource {
         final contents = await file.readAsString();
         final List<dynamic> jsonList = json.decode(contents);
         _tasks = jsonList
-            .map((e) => LocalTaskDTO.fromJson(e as Map<String, dynamic>).toModel())
+            .map((e) => TaskDTO.fromJson(e as Map<String, dynamic>).toEntity())
             .toList();
 
         if (_tasks.isNotEmpty) {
@@ -112,7 +112,7 @@ class LocalTaskDataSource {
 
   Future<void> _saveToFile() async {
     final file = await _getLocalFile();
-    final jsonList = _tasks.map((task) => task.toLocalDto().toJson()).toList();
+    final jsonList = _tasks.map((task) => task.toDTO().toJson()).toList();
     await file.writeAsString(json.encode(jsonList));
   }
 
@@ -185,14 +185,14 @@ class LocalTaskDataSource {
 
   Future<String> exportToJson() async {
     await init();
-    final jsonList = _tasks.map((task) => task.toLocalDto().toJson()).toList();
+    final jsonList = _tasks.map((task) => task.toDTO().toJson()).toList();
     return json.encode(jsonList);
   }
 
   Future<void> importFromJson(String jsonString) async {
     final List<dynamic> jsonList = json.decode(jsonString);
     _tasks = jsonList
-        .map((e) => LocalTaskDTO.fromJson(e as Map<String, dynamic>).toModel())
+        .map((e) => TaskDTO.fromJson(e as Map<String, dynamic>).toEntity())
         .toList();
 
     if (_tasks.isNotEmpty) {

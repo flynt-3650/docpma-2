@@ -1,8 +1,8 @@
-import '../../../../../core/models/task.dart';
-import '../local_task_dto.dart';
+import '../../../../domain/entities/task_entity.dart';
+import '../dto/task_dto.dart';
 
-extension LocalTaskDtoToModelMapper on LocalTaskDTO {
-  TaskEntity toModel() {
+extension TaskMapper on TaskDTO {
+  TaskEntity toEntity() {
     return TaskEntity(
       id: id,
       title: title,
@@ -17,9 +17,9 @@ extension LocalTaskDtoToModelMapper on LocalTaskDTO {
   }
 }
 
-extension LocalTaskModelToDtoMapper on TaskEntity {
-  LocalTaskDTO toLocalDto() {
-    return LocalTaskDTO(
+extension TaskToDTO on TaskEntity {
+  TaskDTO toDTO() {
+    return TaskDTO(
       id: id,
       title: title,
       description: description,
