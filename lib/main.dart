@@ -11,6 +11,7 @@ import 'features/tasks/screens/statistics_screen.dart';
 import 'features/tasks/screens/settings_screen.dart';
 import 'features/tasks/screens/profile_screen.dart';
 import 'features/tasks/screens/calendar_screen.dart';
+import 'features/network/screens/network_demo_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,6 +62,10 @@ class TaskMasterApp extends ConsumerWidget {
         GoRoute(
           path: '/calendar',
           builder: (context, state) => const CalendarScreen(),
+        ),
+        GoRoute(
+          path: '/network',
+          builder: (context, state) => const NetworkDemoScreen(),
         ),
       ],
     );
