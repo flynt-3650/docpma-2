@@ -1,4 +1,4 @@
-import '../entities/task_entity.dart';
+import '../../core/models/task_entity.dart';
 import '../repositories/task_repository.dart';
 
 class GetAllTasksUseCase {

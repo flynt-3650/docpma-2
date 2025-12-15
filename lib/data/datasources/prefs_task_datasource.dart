@@ -1,31 +1,34 @@
 import 'dart:convert';
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/exceptions/storage_exceptions.dart';
 import '../../core/models/task_entity.dart';
 
-/// Local tasks storage backed by [FlutterSecureStorage].
+/// Local tasks storage backed by SharedPreferences.
 ///
 /// Stores tasks as JSON string under [_storageKey].
-class FileTaskDataSource {
+class PrefsTaskDataSource {
   /// Kept as `tasks_data` to support migration from previous versions.
   static const String _storageKey = 'tasks_data';
 
-  final FlutterSecureStorage _secureStorage;
+  SharedPreferences? _prefs;
 
-  FileTaskDataSource({FlutterSecureStorage? secureStorage})
-    : _secureStorage = secureStorage ?? const FlutterSecureStorage();
+  Future<SharedPreferences> _getPrefs() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs!;
+  }
 
   Future<List<TaskEntity>> readAll() async {
     try {
-      final raw = await _secureStorage.read(key: _storageKey);
+      final prefs = await _getPrefs();
+      final raw = prefs.getString(_storageKey);
       if (raw == null || raw.isEmpty) return const [];
 
       final decoded = json.decode(raw);
       if (decoded is! List) {
         throw const StorageCorruptedDataException(
-          'Некорректный формат задач в SecureStorage (ожидался список)',
+          'Некорректный формат задач в SharedPreferences (ожидался список)',
         );
       }
 
@@ -39,7 +42,7 @@ class FileTaskDataSource {
       rethrow;
     } catch (e) {
       throw StorageReadException(
-        'Ошибка чтения задач из SecureStorage',
+        'Ошибка чтения задач из SharedPreferences',
         cause: e,
       );
     }
@@ -47,13 +50,14 @@ class FileTaskDataSource {
 
   Future<void> writeAll(List<TaskEntity> tasks) async {
     try {
+      final prefs = await _getPrefs();
       final list = tasks
           .map((t) => _TaskLocalDto.fromModel(t).toJson())
           .toList();
-      await _secureStorage.write(key: _storageKey, value: json.encode(list));
+      await prefs.setString(_storageKey, json.encode(list));
     } catch (e) {
       throw StorageWriteException(
-        'Ошибка сохранения задач в SecureStorage',
+        'Ошибка сохранения задач в SharedPreferences',
         cause: e,
       );
     }
@@ -61,17 +65,18 @@ class FileTaskDataSource {
 
   Future<void> clearAll() async {
     try {
-      await _secureStorage.delete(key: _storageKey);
+      final prefs = await _getPrefs();
+      await prefs.remove(_storageKey);
     } catch (e) {
       throw StorageWriteException(
-        'Ошибка очистки задач в SecureStorage',
+        'Ошибка очистки задач в SharedPreferences',
         cause: e,
       );
     }
   }
 }
 
-/// DTO for local persistence (SecureStorage).
+/// DTO for local persistence (SharedPreferences).
 ///
 /// Intentionally kept private to avoid leaking outside datasource.
 class _TaskLocalDto {

@@ -5,7 +5,6 @@ import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
 import 'interceptors/logging_interceptor.dart';
 
-/// Dio client configured with interceptors + helper methods.
 class DioClientWithInterceptors {
   DioClientWithInterceptors({
     required String baseUrl,

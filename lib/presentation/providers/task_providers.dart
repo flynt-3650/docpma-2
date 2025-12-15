@@ -1,47 +1,57 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/task_entity.dart';
-import '../../domain/repositories/task_repository.dart';
+import '../../core/models/task_entity.dart';
+import '../../dependency_container.dart';
 import '../../domain/usecases/task_usecases.dart';
-import '../../data/repositories/task_repository_impl.dart';
-import '../../data/datasources/file_task_datasource.dart';
-import '../../data/datasources/settings_local_datasource.dart';
-
-final fileTaskDataSourceProvider = Provider<FileTaskDataSource>((ref) {
-  return FileTaskDataSource();
-});
-
-final settingsDataSourceProvider = Provider<SettingsLocalDataSource>((ref) {
-  return SettingsLocalDataSource();
-});
-
-final taskRepositoryProvider = Provider<TaskRepository>((ref) {
-  final fileDataSource = ref.watch(fileTaskDataSourceProvider);
-  return TaskRepositoryImpl(localDataSource: fileDataSource);
-});
+import '../../domain/usecases/settings_usecases.dart';
 
 final getAllTasksUseCaseProvider = Provider<GetAllTasksUseCase>((ref) {
-  return GetAllTasksUseCase(ref.watch(taskRepositoryProvider));
+  return di.getAllTasksUseCase;
 });
 
 final addTaskUseCaseProvider = Provider<AddTaskUseCase>((ref) {
-  return AddTaskUseCase(ref.watch(taskRepositoryProvider));
+  return di.addTaskUseCase;
 });
 
 final updateTaskUseCaseProvider = Provider<UpdateTaskUseCase>((ref) {
-  return UpdateTaskUseCase(ref.watch(taskRepositoryProvider));
+  return di.updateTaskUseCase;
 });
 
 final deleteTaskUseCaseProvider = Provider<DeleteTaskUseCase>((ref) {
-  return DeleteTaskUseCase(ref.watch(taskRepositoryProvider));
+  return di.deleteTaskUseCase;
 });
 
 final toggleTaskStatusUseCaseProvider = Provider<ToggleTaskStatusUseCase>((
   ref,
 ) {
-  return ToggleTaskStatusUseCase(ref.watch(taskRepositoryProvider));
+  return di.toggleTaskStatusUseCase;
 });
 
-class TasksNotifier extends StateNotifier<List<TaskEntity>> {
+class TasksUiState {
+  final bool isLoading;
+  final String? error;
+  final List<TaskEntity> tasks;
+
+  const TasksUiState({
+    this.isLoading = false,
+    this.error,
+    this.tasks = const [],
+  });
+
+  TasksUiState copyWith({
+    bool? isLoading,
+    String? error,
+    List<TaskEntity>? tasks,
+    bool clearError = false,
+  }) {
+    return TasksUiState(
+      isLoading: isLoading ?? this.isLoading,
+      error: clearError ? null : (error ?? this.error),
+      tasks: tasks ?? this.tasks,
+    );
+  }
+}
+
+class TasksNotifier extends StateNotifier<TasksUiState> {
   final GetAllTasksUseCase _getAllTasksUseCase;
   final AddTaskUseCase _addTaskUseCase;
   final UpdateTaskUseCase _updateTaskUseCase;
@@ -59,12 +69,20 @@ class TasksNotifier extends StateNotifier<List<TaskEntity>> {
        _updateTaskUseCase = updateTaskUseCase,
        _deleteTaskUseCase = deleteTaskUseCase,
        _toggleTaskStatusUseCase = toggleTaskStatusUseCase,
-       super([]) {
+       super(const TasksUiState()) {
     _loadTasks();
   }
 
+  Future<void> reload() => _loadTasks();
+
   Future<void> _loadTasks() async {
-    state = await _getAllTasksUseCase.execute();
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final tasks = await _getAllTasksUseCase.execute();
+      state = state.copyWith(isLoading: false, tasks: tasks);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: asErrorMessage(e));
+    }
   }
 
   Future<void> addTask({
@@ -74,43 +92,61 @@ class TasksNotifier extends StateNotifier<List<TaskEntity>> {
     TaskCategory category = TaskCategory.other,
     DateTime? dueDate,
   }) async {
-    await _addTaskUseCase.execute(
-      title: title,
-      description: description,
-      priority: priority,
-      category: category,
-      dueDate: dueDate,
-    );
-    await _loadTasks();
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      await _addTaskUseCase.execute(
+        title: title,
+        description: description,
+        priority: priority,
+        category: category,
+        dueDate: dueDate,
+      );
+      await _loadTasks();
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: asErrorMessage(e));
+    }
   }
 
   Future<void> updateTask(TaskEntity task) async {
-    await _updateTaskUseCase.execute(task);
-    await _loadTasks();
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      await _updateTaskUseCase.execute(task);
+      await _loadTasks();
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: asErrorMessage(e));
+    }
   }
 
   Future<void> deleteTask(String id) async {
-    await _deleteTaskUseCase.execute(id);
-    await _loadTasks();
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      await _deleteTaskUseCase.execute(id);
+      await _loadTasks();
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: asErrorMessage(e));
+    }
   }
 
   Future<void> toggleTaskStatus(String id) async {
-    await _toggleTaskStatusUseCase.execute(id);
-    await _loadTasks();
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      await _toggleTaskStatusUseCase.execute(id);
+      await _loadTasks();
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: asErrorMessage(e));
+    }
   }
 
   TaskEntity? getTaskById(String id) {
     try {
-      return state.firstWhere((task) => task.id == id);
-    } catch (e) {
+      return state.tasks.firstWhere((task) => task.id == id);
+    } catch (_) {
       return null;
     }
   }
 }
 
-final tasksProvider = StateNotifierProvider<TasksNotifier, List<TaskEntity>>((
-  ref,
-) {
+final tasksProvider = StateNotifierProvider<TasksNotifier, TasksUiState>((ref) {
   return TasksNotifier(
     getAllTasksUseCase: ref.watch(getAllTasksUseCaseProvider),
     addTaskUseCase: ref.watch(addTaskUseCaseProvider),
@@ -132,7 +168,7 @@ final selectedCategoryProvider = StateProvider<TaskCategory?>((ref) => null);
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
 final filteredTasksProvider = Provider<List<TaskEntity>>((ref) {
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   final filter = ref.watch(taskFilterProvider);
   final category = ref.watch(selectedCategoryProvider);
   final searchQuery = ref.watch(searchQueryProvider).toLowerCase();
@@ -181,34 +217,34 @@ final filteredTasksProvider = Provider<List<TaskEntity>>((ref) {
 });
 
 final completedTasksProvider = Provider<List<TaskEntity>>((ref) {
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   return tasks.where((task) => task.status == TaskStatus.completed).toList();
 });
 
 final inProgressTasksProvider = Provider<List<TaskEntity>>((ref) {
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   return tasks.where((task) => task.status == TaskStatus.inProgress).toList();
 });
 
 final plannedTasksProvider = Provider<List<TaskEntity>>((ref) {
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   return tasks.where((task) => task.status == TaskStatus.planned).toList();
 });
 
 final overdueTasksProvider = Provider<List<TaskEntity>>((ref) {
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   return tasks.where((task) => task.isOverdue).toList();
 });
 
 final todayTasksProvider = Provider<List<TaskEntity>>((ref) {
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   return tasks.where((task) => task.isDueToday).toList();
 });
 
 final tasksByCategoryProvider = Provider<Map<TaskCategory, List<TaskEntity>>>((
   ref,
 ) {
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   final map = <TaskCategory, List<TaskEntity>>{};
   for (final category in TaskCategory.values) {
     map[category] = tasks.where((t) => t.category == category).toList();
@@ -217,7 +253,7 @@ final tasksByCategoryProvider = Provider<Map<TaskCategory, List<TaskEntity>>>((
 });
 
 final taskByIdProvider = Provider.family<TaskEntity?, String>((ref, id) {
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   try {
     return tasks.firstWhere((task) => task.id == id);
   } catch (e) {
@@ -228,7 +264,7 @@ final taskByIdProvider = Provider.family<TaskEntity?, String>((ref, id) {
 final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
 final tasksForSelectedDateProvider = Provider<List<TaskEntity>>((ref) {
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   final selectedDate = ref.watch(selectedDateProvider);
 
   return tasks.where((task) {
@@ -242,7 +278,7 @@ final tasksForSelectedDateProvider = Provider<List<TaskEntity>>((ref) {
 final tasksWithDueDatesProvider = Provider<Map<DateTime, List<TaskEntity>>>((
   ref,
 ) {
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   final map = <DateTime, List<TaskEntity>>{};
 
   for (final task in tasks) {
@@ -262,61 +298,78 @@ final tasksWithDueDatesProvider = Provider<Map<DateTime, List<TaskEntity>>>((
 final appVersionProvider = Provider<String>((ref) => '2.0.0');
 
 final isDarkModeAsyncProvider = FutureProvider<bool>((ref) async {
-  final settingsDataSource = ref.watch(settingsDataSourceProvider);
-  return await settingsDataSource.getDarkMode();
+  return await di.getDarkModeUseCase.execute();
 });
 
 final isDarkModeProvider = StateNotifierProvider<DarkModeNotifier, bool>((ref) {
-  final settingsDataSource = ref.watch(settingsDataSourceProvider);
-  return DarkModeNotifier(settingsDataSource);
+  return DarkModeNotifier(
+    getDarkModeUseCase: di.getDarkModeUseCase,
+    setDarkModeUseCase: di.setDarkModeUseCase,
+    toggleDarkModeUseCase: di.toggleDarkModeUseCase,
+  );
 });
 
 class DarkModeNotifier extends StateNotifier<bool> {
-  final SettingsLocalDataSource _settingsDataSource;
+  final GetDarkModeUseCase _getDarkModeUseCase;
+  final SetDarkModeUseCase _setDarkModeUseCase;
+  final ToggleDarkModeUseCase _toggleDarkModeUseCase;
 
-  DarkModeNotifier(this._settingsDataSource) : super(true) {
+  DarkModeNotifier({
+    required GetDarkModeUseCase getDarkModeUseCase,
+    required SetDarkModeUseCase setDarkModeUseCase,
+    required ToggleDarkModeUseCase toggleDarkModeUseCase,
+  }) : _getDarkModeUseCase = getDarkModeUseCase,
+       _setDarkModeUseCase = setDarkModeUseCase,
+       _toggleDarkModeUseCase = toggleDarkModeUseCase,
+       super(true) {
     _loadSavedValue();
   }
 
   Future<void> _loadSavedValue() async {
-    state = await _settingsDataSource.getDarkMode();
+    state = await _getDarkModeUseCase.execute();
   }
 
   Future<void> toggle() async {
-    state = !state;
-    await _settingsDataSource.setDarkMode(state);
+    state = await _toggleDarkModeUseCase.execute(state);
   }
 
   Future<void> setValue(bool value) async {
     state = value;
-    await _settingsDataSource.setDarkMode(value);
+    await _setDarkModeUseCase.execute(value);
   }
 }
 
 final userNameAsyncProvider = FutureProvider<String>((ref) async {
-  final settingsDataSource = ref.watch(settingsDataSourceProvider);
-  return await settingsDataSource.getUserName();
+  return await di.getUserNameUseCase.execute();
 });
 
 final userNameProvider = StateNotifierProvider<UserNameNotifier, String>((ref) {
-  final settingsDataSource = ref.watch(settingsDataSourceProvider);
-  return UserNameNotifier(settingsDataSource);
+  return UserNameNotifier(
+    getUserNameUseCase: di.getUserNameUseCase,
+    setUserNameUseCase: di.setUserNameUseCase,
+  );
 });
 
 class UserNameNotifier extends StateNotifier<String> {
-  final SettingsLocalDataSource _settingsDataSource;
+  final GetUserNameUseCase _getUserNameUseCase;
+  final SetUserNameUseCase _setUserNameUseCase;
 
-  UserNameNotifier(this._settingsDataSource) : super('Гость') {
+  UserNameNotifier({
+    required GetUserNameUseCase getUserNameUseCase,
+    required SetUserNameUseCase setUserNameUseCase,
+  }) : _getUserNameUseCase = getUserNameUseCase,
+       _setUserNameUseCase = setUserNameUseCase,
+       super('Гость') {
     _loadSavedValue();
   }
 
   Future<void> _loadSavedValue() async {
-    state = await _settingsDataSource.getUserName();
+    state = await _getUserNameUseCase.execute();
   }
 
   Future<void> setName(String name) async {
     state = name;
-    await _settingsDataSource.setUserName(name);
+    await _setUserNameUseCase.execute(name);
   }
 }
 
@@ -338,7 +391,7 @@ class UserStats {
 }
 
 final userStatsProvider = Provider<UserStats>((ref) {
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   final completed = tasks.where((t) => t.status == TaskStatus.completed).length;
 
   return UserStats(
@@ -355,6 +408,6 @@ final timeStreamProvider = StreamProvider<DateTime>((ref) {
 
 final asyncTasksCountProvider = FutureProvider<int>((ref) async {
   await Future.delayed(const Duration(seconds: 1));
-  final tasks = ref.watch(tasksProvider);
+  final tasks = ref.watch(tasksProvider).tasks;
   return tasks.length;
 });

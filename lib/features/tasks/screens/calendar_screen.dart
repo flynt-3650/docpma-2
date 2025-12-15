@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/task_entity.dart';
+import '../../../core/models/task_entity.dart';
 
 typedef Task = TaskEntity;
 
@@ -27,6 +27,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tasksState = ref.watch(tasksProvider);
     final tasksWithDates = ref.watch(tasksWithDueDatesProvider);
     final selectedDateTasks = ref.watch(tasksForSelectedDateProvider);
 
@@ -49,6 +50,38 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       ),
       body: Column(
         children: [
+          if (tasksState.error != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.error.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.error_outline, color: AppColors.error),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        tasksState.error!,
+                        style: const TextStyle(color: AppColors.error),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () =>
+                          ref.read(tasksProvider.notifier).reload(),
+                      child: const Text('Повторить'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(

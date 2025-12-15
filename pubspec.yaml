@@ -19,13 +19,12 @@ dependencies:
   get_it: ^7.6.0
   flutter_riverpod: ^2.4.0
   shared_preferences: ^2.2.2
+  flutter_secure_storage: ^9.2.2
   path_provider: ^2.1.2
 
-  # Networking (PR13)
   dio: ^5.0.0
   retrofit: ^4.0.1
 
-  # JSON serialization (PR13)
   json_annotation: ^4.9.0
 
 dev_dependencies:
@@ -39,14 +38,11 @@ dev_dependencies:
   web_socket_channel: ^3.0.3
   http: ^1.2.0
 
-  # Codegen (PR13)
   build_runner: ^2.4.6
   retrofit_generator: ^10.2.0
   json_serializable: ^6.7.1
 
 dependency_overrides:
-  # retrofit_generator 10.x declares analyzer 9 support, but full analyzer 9 API
-  # migration is still pending. Pin to analyzer 8.x to keep build_runner working.
   analyzer: ^8.3.0
 
 flutter:

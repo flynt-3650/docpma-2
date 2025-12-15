@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/task_entity.dart';
+import '../../../core/models/task_entity.dart';
 
 typedef Task = TaskEntity;
 
@@ -14,6 +14,7 @@ class TaskDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tasksState = ref.watch(tasksProvider);
     final task = ref.watch(taskByIdProvider(taskId));
     final timeAsync = ref.watch(timeStreamProvider);
 
@@ -24,21 +25,48 @@ class TaskDetailsScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.search_off_rounded,
-                size: 80,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Задача не найдена',
-                style: TextStyle(
-                  fontSize: 18,
+              if (tasksState.error != null) ...[
+                Icon(
+                  Icons.error_outline,
+                  size: 80,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Text(
+                    tasksState.error!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => ref.read(tasksProvider.notifier).reload(),
+                  child: const Text('Повторить'),
+                ),
+              ] else ...[
+                Icon(
+                  Icons.search_off_rounded,
+                  size: 80,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.onSurface.withOpacity(0.3),
                 ),
-              ),
+                const SizedBox(height: 16),
+                Text(
+                  'Задача не найдена',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/task_entity.dart';
+import '../../../core/models/task_entity.dart';
 
 typedef Task = TaskEntity;
 

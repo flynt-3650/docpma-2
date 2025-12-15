@@ -2,7 +2,6 @@ import '../../core/models/country_info.dart';
 import '../../core/models/post.dart';
 import '../repositories/network_demo_repository.dart';
 
-/// Use-cases for PR13 networking demo.
 class NetworkDemoUseCases {
   NetworkDemoUseCases(this._repo);
 

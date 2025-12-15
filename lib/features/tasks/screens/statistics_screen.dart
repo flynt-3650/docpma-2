@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/task_entity.dart';
+import '../../../core/models/task_entity.dart';
 
 typedef Task = TaskEntity;
 
@@ -11,7 +11,8 @@ class StatisticsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tasks = ref.watch(tasksProvider);
+    final tasksState = ref.watch(tasksProvider);
+    final tasks = tasksState.tasks;
     final completed = ref.watch(completedTasksProvider);
     final inProgress = ref.watch(inProgressTasksProvider);
     final planned = ref.watch(plannedTasksProvider);
@@ -24,9 +25,7 @@ class StatisticsScreen extends ConsumerWidget {
     final completedCount = completed.length;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Статистика'),
-      ),
+      appBar: AppBar(title: const Text('Статистика')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -140,7 +139,9 @@ class StatisticsScreen extends ConsumerWidget {
                         value: completedCount / total,
                         minHeight: 12,
                         backgroundColor: AppColors.success.withOpacity(0.1),
-                        valueColor: const AlwaysStoppedAnimation(AppColors.success),
+                        valueColor: const AlwaysStoppedAnimation(
+                          AppColors.success,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -150,7 +151,9 @@ class StatisticsScreen extends ConsumerWidget {
                         Text(
                           '$completedCount из $total задач выполнено',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.6),
                           ),
                         ),
                         Text(
@@ -213,21 +216,27 @@ class StatisticsScreen extends ConsumerWidget {
               Expanded(
                 child: _PriorityStatCard(
                   priority: TaskPriority.high,
-                  count: tasks.where((t) => t.priority == TaskPriority.high).length,
+                  count: tasks
+                      .where((t) => t.priority == TaskPriority.high)
+                      .length,
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _PriorityStatCard(
                   priority: TaskPriority.medium,
-                  count: tasks.where((t) => t.priority == TaskPriority.medium).length,
+                  count: tasks
+                      .where((t) => t.priority == TaskPriority.medium)
+                      .length,
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _PriorityStatCard(
                   priority: TaskPriority.low,
-                  count: tasks.where((t) => t.priority == TaskPriority.low).length,
+                  count: tasks
+                      .where((t) => t.priority == TaskPriority.low)
+                      .length,
                 ),
               ),
             ],
@@ -252,7 +261,10 @@ class StatisticsScreen extends ConsumerWidget {
                 color: AppColors.primary.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.cloud_done_rounded, color: AppColors.primary),
+              child: const Icon(
+                Icons.cloud_done_rounded,
+                color: AppColors.primary,
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -263,7 +275,9 @@ class StatisticsScreen extends ConsumerWidget {
                     'Асинхронная загрузка',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -307,10 +321,7 @@ class StatisticsScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 16),
-            const Text(
-              'Загрузка данных...',
-              style: TextStyle(fontSize: 16),
-            ),
+            const Text('Загрузка данных...', style: TextStyle(fontSize: 16)),
           ],
         ),
       ),
@@ -395,10 +406,7 @@ class _CategoryStatCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
-                  category.emoji,
-                  style: const TextStyle(fontSize: 24),
-                ),
+                Text(category.emoji, style: const TextStyle(fontSize: 24)),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -416,7 +424,9 @@ class _CategoryStatCard extends StatelessWidget {
                         '$completed из $total выполнено',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                     ],
@@ -472,10 +482,7 @@ class _PriorityStatCard extends StatelessWidget {
   final TaskPriority priority;
   final int count;
 
-  const _PriorityStatCard({
-    required this.priority,
-    required this.count,
-  });
+  const _PriorityStatCard({required this.priority, required this.count});
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/models/post.dart';
 import '../../../../core/network/exceptions/network_exceptions.dart';
-import '../dto/post_dto.dart';
+import '../dto/mappers/post_mapper.dart';
 import 'json_placeholder_api.dart';
 
 /// Remote datasource for JSONPlaceholder.
@@ -10,9 +11,10 @@ class JsonPlaceholderDataSource {
 
   final JsonPlaceholderApi _api;
 
-  Future<List<PostDTO>> getPosts({required int userId}) async {
+  Future<List<Post>> getPosts({required int userId}) async {
     try {
-      return await _api.getPosts(userId);
+      final dtos = await _api.getPosts(userId);
+      return dtos.map((e) => e.toModel()).toList();
     } on DioException catch (e) {
       throw e.error ??
           const NetworkException('Ошибка при получении списка постов');
@@ -21,17 +23,18 @@ class JsonPlaceholderDataSource {
     }
   }
 
-  Future<PostDTO> createPost({
+  Future<Post> createPost({
     required int userId,
     required String title,
     required String body,
   }) async {
     try {
-      return await _api.createPost({
+      final dto = await _api.createPost({
         'userId': userId,
         'title': title,
         'body': body,
       });
+      return dto.toModel();
     } on DioException catch (e) {
       throw e.error ?? const NetworkException('Ошибка при создании поста');
     } catch (e) {
@@ -39,18 +42,19 @@ class JsonPlaceholderDataSource {
     }
   }
 
-  Future<PostDTO> updatePost({
+  Future<Post> updatePost({
     required int id,
     required int userId,
     required String title,
     required String body,
   }) async {
     try {
-      return await _api.updatePost(id, {
+      final dto = await _api.updatePost(id, {
         'userId': userId,
         'title': title,
         'body': body,
       });
+      return dto.toModel();
     } on DioException catch (e) {
       throw e.error ??
           const NetworkException('Ошибка при обновлении поста (PUT)');
@@ -59,12 +63,10 @@ class JsonPlaceholderDataSource {
     }
   }
 
-  Future<PostDTO> patchPostTitle({
-    required int id,
-    required String title,
-  }) async {
+  Future<Post> patchPostTitle({required int id, required String title}) async {
     try {
-      return await _api.patchPost(id, {'title': title});
+      final dto = await _api.patchPost(id, {'title': title});
+      return dto.toModel();
     } on DioException catch (e) {
       throw e.error ??
           const NetworkException('Ошибка при частичном обновлении (PATCH)');

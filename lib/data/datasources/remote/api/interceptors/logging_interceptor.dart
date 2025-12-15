@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 
-/// Interceptor that logs every request/response/error.
 class LoggingInterceptor extends Interceptor {
   LoggingInterceptor({this.tag = 'HTTP'});
 

@@ -2,7 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'post_dto.g.dart';
 
-/// DTO for JSONPlaceholder /posts
 @JsonSerializable()
 class PostDTO {
   final int? userId;

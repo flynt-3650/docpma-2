@@ -1,4 +1,4 @@
-import '../../domain/entities/task_entity.dart';
+import '../../core/models/task_entity.dart';
 
 class LocalTaskDataSource {
   final List<TaskEntity> _tasks = [

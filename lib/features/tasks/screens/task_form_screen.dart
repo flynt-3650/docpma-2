@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../dependency_container.dart';
 import '../../../presentation/providers/task_providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/task_entity.dart';
+import '../../../core/models/task_entity.dart';
 
 typedef Task = TaskEntity;
 
@@ -106,7 +107,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Ошибка: $e'),
+              content: Text('Ошибка: ${asErrorMessage(e)}'),
               backgroundColor: AppColors.error,
             ),
           );

@@ -1,4 +1,4 @@
-import '../entities/task_entity.dart';
+import '../../core/models/task_entity.dart';
 
 abstract class TaskRepository {
   Future<List<TaskEntity>> getAllTasks();

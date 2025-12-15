@@ -63,10 +63,7 @@ class NetworkDemoNotifier extends StateNotifier<NetworkDemoUiState> {
       final posts = await _useCases.getPosts(userId: 1);
       state = state.copyWith(isLoading: false, posts: posts);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: asNetworkException(e).message,
-      );
+      state = state.copyWith(isLoading: false, error: asErrorMessage(e));
     }
   }
 
@@ -80,10 +77,7 @@ class NetworkDemoNotifier extends StateNotifier<NetworkDemoUiState> {
       final post = await _useCases.createPost(userId: 1);
       state = state.copyWith(isLoading: false, lastPost: post);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: asNetworkException(e).message,
-      );
+      state = state.copyWith(isLoading: false, error: asErrorMessage(e));
     }
   }
 
@@ -97,10 +91,7 @@ class NetworkDemoNotifier extends StateNotifier<NetworkDemoUiState> {
       final post = await _useCases.updatePostPut(id: 1, userId: 1);
       state = state.copyWith(isLoading: false, lastPost: post);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: asNetworkException(e).message,
-      );
+      state = state.copyWith(isLoading: false, error: asErrorMessage(e));
     }
   }
 
@@ -114,10 +105,7 @@ class NetworkDemoNotifier extends StateNotifier<NetworkDemoUiState> {
       final post = await _useCases.patchPostTitle(id: 1);
       state = state.copyWith(isLoading: false, lastPost: post);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: asNetworkException(e).message,
-      );
+      state = state.copyWith(isLoading: false, error: asErrorMessage(e));
     }
   }
 
@@ -131,10 +119,7 @@ class NetworkDemoNotifier extends StateNotifier<NetworkDemoUiState> {
       await _useCases.deletePost(id: 1);
       state = state.copyWith(isLoading: false, lastPost: null);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: asNetworkException(e).message,
-      );
+      state = state.copyWith(isLoading: false, error: asErrorMessage(e));
     }
   }
 
@@ -148,10 +133,7 @@ class NetworkDemoNotifier extends StateNotifier<NetworkDemoUiState> {
       final country = await _useCases.getCountry(name);
       state = state.copyWith(isLoading: false, country: country);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: asNetworkException(e).message,
-      );
+      state = state.copyWith(isLoading: false, error: asErrorMessage(e));
     }
   }
 }
